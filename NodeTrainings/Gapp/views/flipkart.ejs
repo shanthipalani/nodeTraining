@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Express</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12 form-container flipkart">
+            <h1><%=title%></h1>
+        </div>
+        <div class="col-md-12 form-container response-container">
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+<script src="/javascripts/jquery-3.3.1.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+
+    $(document).ready(function(){
+        var data = {
+            flag:"deals"
+        }
+
+        apiSearch(data);
+
+        function apiSearch(data){
+            $.ajax({
+                url : "/flipkart/api",
+                type : "POST",
+                data : data,
+                success : function(data) {
+                    console.log(data);
+
+                    if (data.flag) {
+                        console.log(data.data.dotdList.length);
+
+                        var response = data.data.dotdList;
+
+                        if(response.length > 0){
+
+
+                            var reponsehtml = "<div class='row'><div class='row'>";
+
+                            for(var i=0;i<response.length;i++){
+
+                                console.log(response[i].name);
+
+                                reponsehtml+= "<div class='col-md-4 col-xs-12' style='border:1px solid #000;'>"+response[i].name+"</div>";
+                            }
+
+                            reponsehtml+= "</div></div>"
+                            $('.response-container').html(reponsehtml);
+                        }else{
+                            $('.response-container').html("<h1>No deals for today</h1>");
+                        }
+
+                    } else {
+                        alert("Something went wrong");
+                    }
+
+                },
+                error : function() {
+                    alert("error");
+                }
+            });
+
+        }
+
+    });
+</script>
+</html>

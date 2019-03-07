@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Express</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 form-container">
+
+            <h1><%= title %></h1>
+
+
+            <form id="pdfform" enctype="multipart/form-data">
+
+                <input name="file" type="file" />
+                <input type="password" name="password" Placeholder="Enter password" />
+
+                <button class="btn btn-success btn-pdf" type="submit">Submit</button>
+            </form>
+
+        </div>
+
+    </div>
+
+
+</div>
+</body>
+<script src="/javascripts/jquery-3.3.1.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+
+    $(document).ready(function(){
+
+        $('form#pdfform').click(function(e){
+
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            $.ajax({
+                url:'/decrypt/pdf',
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    alert(data)
+                },
+                error : function() {
+                    alert("error");
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+
+
+        });
+    });
+</script>
+</html>

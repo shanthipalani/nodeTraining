@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Express</title>
+	<link rel="stylesheet" href="/stylesheets/bootstrap.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+ 		
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 form-container">
+			
+				    <h1><%= title %></h1>q
+				    <p>Welcome to <%= title %></p>
+				
+					<input name="name" class="name" placeholder="Name"/>
+					<input name="email" id="emaiId" class="email" placeholder="Email" />
+					<button type="submit" class="btn btn-submit submit">Submit</button>
+			
+			</div>
+		
+			<div class="col-md-6 form-container">
+				<form>
+				  <div class="form-group">
+				    <label for="exampleInputEmail1">Email address</label>
+				    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+				    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+				  </div>
+				  <div class="form-group">
+				    <label for="exampleInputPassword1">Password</label>
+				    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+				  </div>
+				  <div class="form-check">
+				    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+				    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+				  </div>
+				  <button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+				
+				 <button class="btn btn-dynamic">Submit</button>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-6 form-container api">
+				<input name="search" class="search" placeholder="Eanter search value"/>
+
+				<button type="submit" class="btn btn-warning api-search">Search</button>
+
+				<div class="people_result">
+				</div>
+
+			</div>
+		</div>
+		
+	</div>
+  </body>
+  <script src="/javascripts/jquery-3.3.1.js"></script>
+  <script src="/javascripts/bootstrap.js"></script>
+  <script>
+
+      $(document).ready(function(){
+		  
+		  $('.btn-dynamic').click(function(){
+		  	
+			  $('.form-container').removeClass('col-md-6');
+			  $('.form-container').addClass('col-md-12');
+		  });
+
+          $('.api-search').click(function(){
+
+              var search = $('.search').val();
+			  var data = {
+			      search:search
+			  }
+              $.ajax({
+                  url : "/search/api",
+                  type : "POST",
+                  data : data,
+                  success : function(data) {
+                      console.log(data);
+
+                      alert("Success");
+
+                      if (data.flag) {
+
+                          var response = data.data;
+                          var forMax;
+                          var resultLength = response.count;
+
+                          if (resultLength > 0) {
+
+                              if (resultLength > 10) {
+                                  forMax = 10;
+                              } else {
+                                  forMax = resultLength;
+                              }
+
+                              var htmlResponse = "";
+                              for (var i = 0; i < forMax; i++) {
+
+                                  var detail = JSON.stringify(response.results[i]);
+                                  htmlResponse += "<div style='border:3px solid #ccc;margin:10px 0px;padding:20px;'>";
+                                  $.each($.parseJSON(detail), function(k, v) {
+
+                                      htmlResponse += "<div style='margin:10px 0px;'> <span style='color:blue'>" + k + "</span> : <span>" + v + "</span></div>";
+                                  });
+                                  htmlResponse += "</div>";
+                              }
+							  console.log(htmlResponse);
+                              $('.people_result').html(htmlResponse);
+
+                          } else {
+                              alert("No Charachter is present in the given name");
+                          }
+                      } else {
+                          alert("Something went wrong");
+                      }
+
+                  },
+                  error : function() {
+                      alert("error");
+                  }
+              });
+
+
+          });
+		
+		  $('.btn-submit').click(function(){
+		
+			  console.log("Buttoon click");
+			  var name = $('.name').val();
+			  var email = $('#emaiId').val();
+			  
+			  if(name == "" || email ==""){
+				  alert("Enter all the details");
+			  }else{
+				  var data={};
+				  data.name = name;
+				  data.email = email;
+				  
+				$.ajax({
+					url : "/sendmail",
+					type : "POST",
+					data : data,
+					success : function(data) {
+						console.log(data);
+			
+						if(data.flag){
+							$('.name').val("");
+							$('#emaiId').val("");
+						}
+						
+						alert(data.msg);
+						
+					},
+					error : function() {
+						alert("error");
+					}
+				});
+				  
+			  }
+		  	
+		  });
+	  });
+  </script>
+</html>

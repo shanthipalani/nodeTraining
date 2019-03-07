@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Express</title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-6 form-container api">
+            <input name="search" class="search" placeholder="Eanter search value"/>
+
+            <button type="submit" class="btn btn-warning api-search">Search</button>
+
+            <div class="people_result">
+            </div>
+
+            <div data-WRID="WRID-152396622534092570" data-widgetType="Push Content"  data-class="affiliateAdsByFlipkart" height="250" width="300"></div><script async src="//affiliate.flipkart.com/affiliate/widgets/FKAffiliateWidgets.js"></script>
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="/javascripts/jquery-3.3.1.js"></script>
+<script src="/javascripts/bootstrap.js"></script>
+<script>
+
+    $(document).ready(function(){
+        $('.api-search').click(function(){
+
+            var search = $('.search').val();
+            var data = {
+                search:search,
+                flag:"search"
+            }
+            apiSearch(data);
+
+        });
+
+        function apiSearch(data){
+            $.ajax({
+                url : "/search/api",
+                type : "POST",
+                data : data,
+                success : function(data) {
+                    console.log(data);
+
+                    alert("Success");
+
+                    if (data.flag) {
+
+                        var response = data.data;
+                        var forMax;
+                        var resultLength = response.count;
+
+
+                        var nextBtn;
+                        var prevBtn;
+                        if (response.next == "null" || response.next == null) {
+                            nextBtn = "";
+
+                        } else {
+                            nextBtn = '<button type="button" class="api-search" data-url=' + response.next + '>NEXT</button>';
+                        }
+
+                        if (response.previous == "null" || response.previous == null) {
+                            prevBtn = "";
+                        } else {
+
+                            prevBtn = '<button type="button" class="api-search" data-url=' + response.previous + '>PREV</button>';
+                        }
+
+
+
+
+                        if (resultLength > 0) {
+
+                            if (resultLength > 10) {
+                                forMax = 10;
+                            } else {
+                                forMax = resultLength;
+                            }
+
+                            var htmlResponse = "";
+                            for (var i = 0; i < forMax; i++) {
+
+                                var detail = JSON.stringify(response.results[i]);
+                                htmlResponse += "<div style='border:3px solid #ccc;margin:10px 0px;padding:20px;'>";
+                                $.each($.parseJSON(detail), function(k, v) {
+
+                                    htmlResponse += "<div style='margin:10px 0px;'> <span style='color:blue'>" + k + "</span> : <span>" + v + "</span></div>";
+                                });
+                                htmlResponse += "</div>";
+                            }
+                            // console.log(htmlResponse);
+
+                            $('.people_result').html("<div>" + htmlResponse + "</div><div>" + prevBtn + " " + nextBtn + "</div>");
+
+
+                            $('.api-search').unbind().click(function(){
+                                var url = $(this).data('url');
+                                console.log(url);
+
+                                var data = {};
+                                data.url = url;
+                                data.flag = "page"
+
+                                apiSearch(data);
+
+
+                            });
+                        } else {
+                            alert("No Charachter is present in the given name");
+                        }
+                    } else {
+                        alert("Something went wrong");
+                    }
+
+                },
+                error : function() {
+                    alert("error");
+                }
+            });
+
+        }
+
+    });
+</script>
+</html>
